@@ -6,7 +6,7 @@ builder.Services.AddRelayHost(options =>
     options.DefaultRelayId = "123";
 });
 var app = builder.Build();
-app.MapRelay().RequireAuthorization();
+app.MapRelay();
 app.MapGet("/", () => builder.Environment.ApplicationName);
 app.MapGet("/server", () => "Hello from Server");
 app.Run();
