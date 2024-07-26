@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UFX.Relay", "src\UFX.Relay\UFX.Relay.csproj", "{0F17BEA7-9BE1-4B6E-A49E-C46D27667128}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Server", "samples\Sample.Server\Sample.Server.csproj", "{303F63AD-4FD9-4054-8DC8-0D411E2130A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Client", "samples\Sample.Client\Sample.Client.csproj", "{6D5E932E-0DA2-4551-97EA-C9D8339CBFD7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F17BEA7-9BE1-4B6E-A49E-C46D27667128}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F17BEA7-9BE1-4B6E-A49E-C46D27667128}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F17BEA7-9BE1-4B6E-A49E-C46D27667128}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F17BEA7-9BE1-4B6E-A49E-C46D27667128}.Release|Any CPU.Build.0 = Release|Any CPU
+		{303F63AD-4FD9-4054-8DC8-0D411E2130A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{303F63AD-4FD9-4054-8DC8-0D411E2130A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{303F63AD-4FD9-4054-8DC8-0D411E2130A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{303F63AD-4FD9-4054-8DC8-0D411E2130A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D5E932E-0DA2-4551-97EA-C9D8339CBFD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D5E932E-0DA2-4551-97EA-C9D8339CBFD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D5E932E-0DA2-4551-97EA-C9D8339CBFD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D5E932E-0DA2-4551-97EA-C9D8339CBFD7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
