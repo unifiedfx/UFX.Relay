@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.AspNetCore.Http.Features;
 using Nerdbank.Streams;
 
-namespace UFX.Relay.Client;
+namespace UFX.Relay.Tunnel.Listener;
 
-public class MultiplexingStreamConnectionContext : ConnectionContext,
+public class TunnelConnectionContext : ConnectionContext,
     IConnectionInherentKeepAliveFeature,
     // IConnectionEndPointFeature,
     IConnectionIdFeature,
@@ -17,7 +17,7 @@ public class MultiplexingStreamConnectionContext : ConnectionContext,
     private readonly CancellationTokenSource cts = new();
     private readonly MultiplexingStream.Channel channel;
 
-    public MultiplexingStreamConnectionContext(string connectionId, MultiplexingStream.Channel channel, WebsocketEndpoint endpoint)
+    public TunnelConnectionContext(string connectionId, MultiplexingStream.Channel channel, TunnelEndpoint endpoint)
     {
         this.channel = channel;
         ConnectionId = connectionId;

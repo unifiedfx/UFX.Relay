@@ -1,12 +1,13 @@
 using System.Diagnostics;
 using System.Net;
+using Nerdbank.Streams;
 using UFX.Relay.Abstractions;
 using Yarp.ReverseProxy.Forwarder;
 
-namespace UFX.Relay.Server;
+namespace UFX.Relay.Tunnel.Forwarder;
 
 
-public class RelayHttpClientFactory(IRelayConnectionManager relayConnectionManager, IHttpContextAccessor accessor) : IForwarderHttpClientFactory {
+public class TunnelForwarderHttpClientFactory(ITunnelManager tunnelManager, IHttpContextAccessor accessor, ITunnelIdProvider tunnelIdProvider) : IForwarderHttpClientFactory {
 
     //TODO: Consider creating a pool of HttpMessageInvoker instances to reuse up to the limit of a MultiplexingStream channel limit
     // effectively there should be a 1-2-1 relationship between the HttpMessageInvoker and the MultiplexingStream channel
@@ -24,7 +25,13 @@ public class RelayHttpClientFactory(IRelayConnectionManager relayConnectionManag
             ActivityHeadersPropagator = (DistributedContextPropagator) new ReverseProxyPropagator(DistributedContextPropagator.Current),
             ConnectTimeout = TimeSpan.FromSeconds(15.0),
             //Note: may maintain a pool of channelId's here and pass the channelid to GetStreamAsync => RelayConnection.GetChannel
-            ConnectCallback = async (ctx, token) => await relayConnectionManager.GetStreamAsync(httpContext!),
+            ConnectCallback = async (ctx, token) =>
+            {
+                var relayId =  await tunnelIdProvider.GetTunnelIdAsync() ?? throw new KeyNotFoundException();
+                var tunnel = await tunnelManager.GetOrCreateTunnelAsync(relayId, token);
+                var channel = await tunnel.GetChannelAsync(tunnel is TunnelHost ? httpContext.Connection.Id : null, token);
+                return channel.AsStream();
+            },
         };
         return new HttpMessageInvoker(handler, true);
     }

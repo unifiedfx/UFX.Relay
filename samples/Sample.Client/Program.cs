@@ -1,11 +1,14 @@
-using UFX.Relay.Client.Extensions;
+
+using UFX.Relay.Tunnel;
+using UFX.Relay.Tunnel.Listener;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.AddRelayListener("wss://localhost:7200", options =>
+builder.WebHost.AddTunnelListener(includeDefaultUrls: true);
+builder.Services.AddTunnelClient(options =>
 {
-    options.GetRelayId = _ => "123";
-}, includeDefaultUrls: true);
-
+    options.TunnelHost = "wss://localhost:7200";
+    options.TunnelId = "123";
+});
 var app = builder.Build();
 app.MapGet("/", () => builder.Environment.ApplicationName);
 app.MapGet("/client", () => "Hello from Client");
