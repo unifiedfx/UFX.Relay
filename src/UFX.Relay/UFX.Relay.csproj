@@ -16,4 +16,10 @@
       <PackageReference Include="Yarp.ReverseProxy" Version="2.1.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Microsoft.VisualStudio.Threading">
+        <HintPath>..\..\samples\Sample.Client\bin\Debug\net8.0\Microsoft.VisualStudio.Threading.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>
