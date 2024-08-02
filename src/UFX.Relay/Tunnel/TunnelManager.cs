@@ -8,7 +8,7 @@ namespace UFX.Relay.Tunnel;
 public class TunnelManager(IEnumerable<ITunnelClientFactory> tunnelClientFactories) : ITunnelManager
 {
     private readonly ConcurrentDictionary<string, Tunnel> tunnels = new();
-    private readonly ITunnelClientFactory? tunnelClientFactory = tunnelClientFactories.OrderByDescending(f => f is ClientTunnelClientFactory).FirstOrDefault();
+    private readonly ITunnelClientFactory? tunnelClientFactory = tunnelClientFactories.MaxBy(f => f is ClientTunnelClientFactory);
 
     public async Task<Tunnel?> GetOrCreateTunnelAsync(string tunnelId, CancellationToken cancellationToken = default)
     {
