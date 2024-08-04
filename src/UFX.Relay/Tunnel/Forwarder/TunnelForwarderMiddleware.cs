@@ -14,13 +14,13 @@ public class TunnelForwarderMiddleware(IHttpForwarder forwarder, TunnelForwarder
         var tunnelId = await tunnelIdProvider.GetTunnelIdAsync();
         if (tunnelId == null)
         {
-            await next(context);
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
             return;
         }
         var tunnel = await tunnelManager.GetOrCreateTunnelAsync(tunnelId, context.RequestAborted);
         if (tunnel == null)
         {
-            await next(context);
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
             return;
         }
         var client = clientFactory.CreateClient(new ForwarderHttpClientContext {NewConfig = HttpClientConfig.Empty});

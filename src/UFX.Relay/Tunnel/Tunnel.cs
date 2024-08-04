@@ -5,6 +5,7 @@ namespace UFX.Relay.Tunnel;
 
 public class Tunnel(MultiplexingStream stream) : IDisposable
 {
+    public Uri? Uri { get; set; }
     private bool channelOfferedSubscribed;
     private readonly Channel<MultiplexingStream.Channel> channels = Channel.CreateUnbounded<MultiplexingStream.Channel>();
     public async Task<MultiplexingStream.Channel> GetChannelAsync(string? channelId, CancellationToken cancellationToken = default)
@@ -32,5 +33,6 @@ public class Tunnel(MultiplexingStream stream) : IDisposable
     public virtual void Dispose() {
         stream.ChannelOffered -= StreamOnChannelOffered;
         stream.Dispose();
-    }    
+    }
+    public override string ToString() => Uri?.ToString() ?? base.ToString();
 }

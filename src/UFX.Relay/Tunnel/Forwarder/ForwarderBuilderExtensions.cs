@@ -14,7 +14,7 @@ public static class ForwarderBuilderExtensions
         return endpoints.Map(path, pipeline);
     }
 
-    public static IServiceCollection AddTunnelForwarder(this IServiceCollection services, Action<TunnelForwarderOptions>? forwarderOptions)
+    public static IServiceCollection AddTunnelForwarder(this IServiceCollection services, Action<TunnelForwarderOptions>? forwarderOptions = null)
     {
         if(forwarderOptions != null) services.Configure(forwarderOptions);
         services.AddHttpForwarder();

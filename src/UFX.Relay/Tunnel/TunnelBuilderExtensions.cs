@@ -6,6 +6,9 @@ namespace UFX.Relay.Tunnel;
 
 public static class TunnelBuilderExtensions
 {
+    public static IServiceCollection AddTunnelClient(this IServiceCollection services, string host) => 
+        services.AddTunnelClient(options => { options.TunnelHost = host; });
+
     public static IServiceCollection AddTunnelClient(this IServiceCollection services, Action<TunnelClientOptions>? clientOptions = null)
     {
         if (clientOptions != null)
