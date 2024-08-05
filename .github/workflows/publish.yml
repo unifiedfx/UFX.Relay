@@ -1,0 +1,32 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Pack All Projects
+        run: dotnet pack --configuration Release -p:Version=${GITHUB_REF##*/v} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+
+      - name: Push All Packages
+        run: dotnet nuget push **/Release/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_APIKEY }} -s https://api.nuget.org/v3/index.json
+
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "**/Release/*.nupkg,**/Release/*.snupkg"

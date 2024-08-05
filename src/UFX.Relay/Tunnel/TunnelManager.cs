@@ -24,15 +24,15 @@ public class TunnelManager(IEnumerable<ITunnelClientFactory> tunnelClientFactori
                 await websocket.ConnectAsync(uri, cancellationToken).ConfigureAwait(false);
                 connected = true;
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
-                websocket?.Dispose();
+                websocket.Dispose();
                 return null;
             }
             catch (WebSocketException ex) {
                 Console.WriteLine("Websocket Error: {0}, {1}", uri, ex.Message);
                 await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
-                websocket = await tunnelClientFactory.CreateAsync();
+                websocket = await tunnelClientFactory.CreateAsync() ?? throw new NullReferenceException("Websocket is null");
             }
         }
         Console.WriteLine("Connected to {0}", uri);

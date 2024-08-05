@@ -11,7 +11,7 @@ public static class WebHostBuilderExtensions
         Console.WriteLine("UseKeyVaultCert: {0}", uri);
         var secret = uri.Segments[2].TrimEnd('/');
         var client = new SecretClient(new Uri($"{uri.Scheme}://{uri.Host}"), new DefaultAzureCredential());
-        X509Certificate2? cert = new X509Certificate2();
+        X509Certificate2? cert;
         try
         {
             var response = client.GetSecret(secret);

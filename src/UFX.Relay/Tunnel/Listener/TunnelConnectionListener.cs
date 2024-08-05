@@ -13,7 +13,7 @@ public class TunnelConnectionListener(TunnelEndpoint tunnelEndpoint, ITunnelIdPr
         while(endpoint?.Tunnel == null)
         {
             if (cancellationToken.IsCancellationRequested) return null;
-            tunnelEndpoint.Tunnel = await tunnelManager.GetOrCreateTunnelAsync(endpoint.TunnelId, cancellationToken);
+            tunnelEndpoint.Tunnel = await tunnelManager.GetOrCreateTunnelAsync(endpoint!.TunnelId!, cancellationToken);
             await Task.Delay(1000, cancellationToken);
         }
         var channel = await endpoint.Tunnel.GetChannelAsync(endpoint.Tunnel is TunnelHost ? Guid.NewGuid().ToString("N") : null, cancellationToken);

@@ -32,7 +32,9 @@ public class Tunnel(MultiplexingStream stream) : IDisposable
 
     public virtual void Dispose() {
         stream.ChannelOffered -= StreamOnChannelOffered;
+#pragma warning disable CS0618 // Type or member is obsolete
         stream.Dispose();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
-    public override string ToString() => Uri?.ToString() ?? base.ToString();
+    public override string ToString() => (Uri?.ToString() ?? base.ToString())!;
 }

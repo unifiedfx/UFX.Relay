@@ -1,0 +1,39 @@
+<Project>
+    <!-- Set the repository root into a variable -->
+    <PropertyGroup>
+        <SourceRoot>$(MSBuildThisFileDirectory)</SourceRoot>
+    </PropertyGroup>
+
+    <!-- Set common properties regarding assembly information and nuget packages -->
+    <PropertyGroup>
+        <Authors>Stephen Welsh</Authors>
+        <Owners>Stephen Welsh, UnifiedFX</Owners>
+        <Title>UFX.Relay - WebSocket Relay between ASPNet Core pipelines</Title>
+        <Description>WebSocket Relay between ASPNet Core pipelines</Description>
+        <RepositoryUrl>https://github.com/UnifiedFX/UFX.Relay</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/UnifiedFX/UFX.Relay</PackageProjectUrl>
+        <PackageIcon>logo_icon_128.png</PackageIcon>
+        <PackageTags>Relay Tunnel YARP C# .NET</PackageTags>
+    </PropertyGroup>
+
+    <!-- Common compile parameters -->
+    <PropertyGroup>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <NoWarn>$(NoWarn);1701;1702;1705;1591;4014;3101;VSTHRD100</NoWarn>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(SourceRoot)assets/logo_icon_128.png" Pack="true" Visible="false" PackagePath="/" />
+    </ItemGroup>
+</Project>

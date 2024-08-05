@@ -7,7 +7,7 @@ public sealed class HostTunnelClientFactory : ITunnelClientFactory
 {
     public ValueTask<ClientWebSocket?> CreateAsync() => new();
 
-    public async ValueTask<Uri> GetUriAsync()
+    public ValueTask<Uri> GetUriAsync()
     {
         throw new NotImplementedException();
     }

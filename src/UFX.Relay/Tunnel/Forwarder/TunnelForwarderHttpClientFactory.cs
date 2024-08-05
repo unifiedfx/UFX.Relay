@@ -29,7 +29,7 @@ public class TunnelForwarderHttpClientFactory(ITunnelManager tunnelManager, IHtt
             {
                 var relayId =  await tunnelIdProvider.GetTunnelIdAsync() ?? throw new KeyNotFoundException();
                 var tunnel = await tunnelManager.GetOrCreateTunnelAsync(relayId, token);
-                var channel = await tunnel.GetChannelAsync(tunnel is TunnelHost ? httpContext.Connection.Id : null, token);
+                var channel = await tunnel!.GetChannelAsync(tunnel is TunnelHost ? httpContext!.Connection.Id : null, token);
                 return channel.AsStream();
             },
         };

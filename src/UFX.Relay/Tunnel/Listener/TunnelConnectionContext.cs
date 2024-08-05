@@ -22,7 +22,7 @@ public class TunnelConnectionContext : ConnectionContext,
         this.channel = channel;
         ConnectionId = connectionId;
         Transport = channel;
-        this.channel.Completion.ContinueWith(_ => cts.Cancel(), TaskScheduler.Default);
+        _ = this.channel.Completion.ContinueWith(_ => cts.Cancel(), TaskScheduler.Default);
         Features.Set<IConnectionInherentKeepAliveFeature>(this);
         // Features.Set<IConnectionEndPointFeature>(this);
         Features.Set<IConnectionIdFeature>(this);
