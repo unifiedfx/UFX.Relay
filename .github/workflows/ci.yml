@@ -45,5 +45,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64,linux/arm64
+          file: ./samples/Service/Host/Dockerfile
           push: true
           tags: unifiedfx/ufx.relay.host:latest
