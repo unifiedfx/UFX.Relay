@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Library</OutputType>
+	    <IsAotCompatible>true</IsAotCompatible>
         <IsPackable>true</IsPackable>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
