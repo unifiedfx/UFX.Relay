@@ -3,6 +3,7 @@
     <PropertyGroup>
         <OutputType>Library</OutputType>
 	    <IsAotCompatible>true</IsAotCompatible>
+	    <EnableRequestDelegateGenerator>true</EnableRequestDelegateGenerator>
         <IsPackable>true</IsPackable>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
