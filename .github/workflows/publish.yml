@@ -29,4 +29,5 @@ jobs:
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
+          skipIfReleaseExists: true
           artifacts: "**/Release/*.nupkg,**/Release/*.snupkg"
