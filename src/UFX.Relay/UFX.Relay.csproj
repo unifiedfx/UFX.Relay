@@ -16,13 +16,7 @@
       <PackageReference Include="Nerdbank.Streams" Version="2.11.74" />
       <PackageReference Include="Yarp.ReverseProxy" Version="2.1.0" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Microsoft.VisualStudio.Threading">
-        <HintPath>..\..\samples\Sample.Client\bin\Debug\net8.0\Microsoft.VisualStudio.Threading.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
+    
     <ItemGroup>
       <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
