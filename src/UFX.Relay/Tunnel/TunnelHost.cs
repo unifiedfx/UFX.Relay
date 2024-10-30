@@ -7,8 +7,9 @@ namespace UFX.Relay.Tunnel;
 // Expose a AddWebSocket method that adds a WebSocket to the collection
 public class TunnelHost(WebSocket webSocket, MultiplexingStream stream) : Tunnel(stream)
 {
-    public override void Dispose() {
-        webSocket.Dispose();
-        base.Dispose();
-    }    
+    protected override async ValueTask DisposeAsyncCore()
+    {
+        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, default);
+        await base.DisposeAsyncCore();
+    }
 }

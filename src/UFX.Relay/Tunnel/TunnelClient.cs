@@ -10,8 +10,14 @@ namespace UFX.Relay.Tunnel;
 // What would be the best way to select an existing ClientWebSocket instance to use?
 public class TunnelClient(ClientWebSocket webSocket, MultiplexingStream stream) : Tunnel(stream)
 {
-    public override void Dispose() {
-        webSocket.Dispose();
-        base.Dispose();
-    }    
+
+    protected override async ValueTask DisposeAsyncCore()
+    {
+        try
+        {
+            await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, default);
+        }
+        catch (OperationCanceledException) { }
+        await base.DisposeAsyncCore();
+    }
 }
