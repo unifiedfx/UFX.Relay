@@ -14,33 +14,30 @@ public class TunnelManager(IEnumerable<ITunnelClientFactory> tunnelClientFactori
     {
         if (tunnels.TryGetValue(tunnelId, out var existingTunnel)) return existingTunnel;
         if (tunnelClientFactory == null) return null;
-        var websocket = await tunnelClientFactory.CreateAsync();
-        if (websocket == null) return null;
         var uri = await tunnelClientFactory.GetUriAsync();
         bool connected = false;
+        ClientWebSocket? websocket = null;
         while (!connected) {
             try
             {
+                websocket = await tunnelClientFactory.CreateAsync();
+                if (websocket == null) return null;
+
                 await websocket.ConnectAsync(uri, cancellationToken).ConfigureAwait(false);
                 connected = true;
             }
-            catch (TaskCanceledException)
+            catch (Exception ex) when (ex is TaskCanceledException || ex is WebSocketException)
             {
-                websocket.Dispose();
-                return null;
-            }
-            catch (WebSocketException ex) {
-                Console.WriteLine("Websocket Error: {0}, {1}", uri, ex.Message);
-                await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
-                websocket = await tunnelClientFactory.CreateAsync() ?? throw new NullReferenceException("Websocket is null");
+                Console.WriteLine("Error: {0}, {1}", uri, ex.Message);
+                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
             }
         }
         Console.WriteLine("Connected to {0}", uri);
-        var stream = MultiplexingStream.Create(websocket.AsStream(), new MultiplexingStream.Options
+        var stream = MultiplexingStream.Create(websocket!.AsStream(), new MultiplexingStream.Options
         {
             ProtocolMajorVersion = 3
         });
-        var tunnel = new TunnelClient(websocket, stream) {Uri = uri};
+        var tunnel = new TunnelClient(websocket!, stream) {Uri = uri};
         //TODO: Reconnect websocket if closed after initial connection if tunnel has not been disposed
         stream.Completion.ContinueWith(_ => tunnels.TryRemove(new KeyValuePair<string, Tunnel>(tunnelId, tunnel)), TaskScheduler.Default);
         return tunnels.GetOrAdd(tunnelId, tunnel);

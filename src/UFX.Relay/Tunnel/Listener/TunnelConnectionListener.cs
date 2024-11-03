@@ -35,7 +35,7 @@ public class TunnelConnectionListener(TunnelEndpoint tunnelEndpoint, ITunnelIdPr
         unbindTokenSource = new CancellationTokenSource();
         endpoint = tunnelEndpoint;
         endpoint.TunnelId = await tunnelIdProvider.GetTunnelIdAsync() ?? throw new KeyNotFoundException("TunnelId not found");
-        var cts = new CancellationTokenSource(5000);
+        var cts = new CancellationTokenSource(10000);
         tunnelEndpoint.Tunnel = await tunnelManager.GetOrCreateTunnelAsync(endpoint.TunnelId, cts.Token);
     }
 
