@@ -11,11 +11,12 @@ namespace UFX.Relay.Tunnel.Listener;
 public static class ListenerBuilderExtensions
 {
     private static bool tunnelListenerAdded;
+    private static ILogger logger = LoggerFactory.Create(logBuilder => logBuilder.AddConsole()).CreateLogger(typeof(ListenerBuilderExtensions));
     public static IWebHostBuilder AddTunnelListener(this IWebHostBuilder builder, Action<TunnelListenerOptions>? tunnelOptions = null, bool includeDefaultUrls = false)
     {
         if (tunnelListenerAdded)
         {
-            Console.WriteLine("Tunnel Listener already added");
+            logger.LogWarning("Tunnel Listener already added");
             return builder;
         }
         tunnelListenerAdded = true;
@@ -40,15 +41,15 @@ public static class ListenerBuilderExtensions
         services.TryAddSingleton<ITunnelManager, TunnelManager>();
         services.TryAddSingleton<SocketTransportFactory>();
         services.TryAddSingleton(provider => 
-            new TunnelConnectionListenerFactory(provider.GetRequiredService<ITunnelIdProvider>(),provider.GetRequiredService<ITunnelManager>()));
+            new TunnelConnectionListenerFactory(provider.GetRequiredService<ITunnelIdProvider>(),provider.GetRequiredService<ITunnelManager>(), provider.GetRequiredService<IOptions<TunnelListenerOptions>>()));
         services.AddSingleton<IConnectionListenerFactory, TunnelCompositeTransportFactory>();
-        return services;        
+        return services;
     }
     
     private static KestrelServerOptions ListenOnTunnel(this KestrelServerOptions options) {
         ArgumentNullException.ThrowIfNull(options);
         options.Listen(new TunnelEndpoint());
-        Console.WriteLine("Added tunnel listener");
+        logger.LogInformation("Added listener endpoint: tunnel://");
         return options;
     }
     
@@ -60,12 +61,12 @@ public static class ListenerBuilderExtensions
             if (IPEndPoint.TryParse(uri.Host, out var endpoint))
             {
                 options.Listen(endpoint, HandleOptions(uri));
-                Console.WriteLine("Added listener: {0}", uri);
+                logger.LogInformation("Added listener endpoint: '{Uri}' via ConfigureKestrel()", uri);
                 continue;
             }
             if (uri.Host != "localhost") continue;
             options.ListenAnyIP(uri.Port, HandleOptions(uri));
-            Console.WriteLine("Added listener: {0}", uri);
+            logger.LogInformation("Added listener endpoint: '{Uri}' via ConfigureKestrel()", uri);
         }
         return options;
         Action<ListenOptions> HandleOptions(Uri uri)
@@ -78,7 +79,7 @@ public static class ListenerBuilderExtensions
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    logger.LogError(e, "Error adding listener: {Uri}", uri);
                 }
             };
         }

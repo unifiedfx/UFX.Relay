@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net;
+using Microsoft.AspNetCore.Connections;
 using Nerdbank.Streams;
 using UFX.Relay.Abstractions;
 using Yarp.ReverseProxy.Forwarder;
@@ -23,13 +24,15 @@ public class TunnelForwarderHttpClientFactory(ITunnelManager tunnelManager, IHtt
             AutomaticDecompression = DecompressionMethods.None,
             UseCookies = false,
             ActivityHeadersPropagator = (DistributedContextPropagator) new ReverseProxyPropagator(DistributedContextPropagator.Current),
+            //NOTE: This is the timeout for the initial connection to the relay, it could be a multiple of the websocket retry delay in TunnelManager for X number of attempts
             ConnectTimeout = TimeSpan.FromSeconds(15.0),
             //Note: may maintain a pool of channelId's here and pass the channelid to GetStreamAsync => RelayConnection.GetChannel
             ConnectCallback = async (ctx, token) =>
             {
                 var relayId =  await tunnelIdProvider.GetTunnelIdAsync() ?? throw new KeyNotFoundException();
                 var tunnel = await tunnelManager.GetOrCreateTunnelAsync(relayId, token);
-                var channel = await tunnel!.GetChannelAsync(tunnel is TunnelHost ? httpContext!.Connection.Id : null, token);
+                if (tunnel == null) throw new ConnectionAbortedException($"Tunnel {relayId} not found");
+                var channel = await tunnel.GetChannelAsync(tunnel is TunnelHost ? httpContext!.Connection.Id : null, token);
                 return channel.AsStream();
             },
         };

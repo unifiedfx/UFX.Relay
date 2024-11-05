@@ -5,7 +5,7 @@ using UFX.Relay.Abstractions;
 
 namespace UFX.Relay.Tunnel;
 
-public class TunnelManager(IEnumerable<ITunnelClientFactory> tunnelClientFactories) : ITunnelManager
+public class TunnelManager(ILogger<TunnelManager> logger, IEnumerable<ITunnelClientFactory> tunnelClientFactories) : ITunnelManager
 {
     private readonly ConcurrentDictionary<string, Tunnel> tunnels = new();
     private readonly ITunnelClientFactory? tunnelClientFactory = tunnelClientFactories.MaxBy(f => f is ClientTunnelClientFactory);
@@ -30,19 +30,23 @@ public class TunnelManager(IEnumerable<ITunnelClientFactory> tunnelClientFactori
                 return null;
             }
             catch (WebSocketException ex) {
-                Console.WriteLine("Websocket Error: {0}, {1}", uri, ex.Message);
+                logger.LogDebug("Websocket Error: {Uri}, {Message}", uri, ex.Message);
                 await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
                 websocket = await tunnelClientFactory.CreateAsync() ?? throw new NullReferenceException("Websocket is null");
             }
         }
-        Console.WriteLine("Connected to {0}", uri);
+        logger.LogInformation("Connected to {Uri}", uri);
         var stream = MultiplexingStream.Create(websocket.AsStream(), new MultiplexingStream.Options
         {
             ProtocolMajorVersion = 3
         });
         var tunnel = new TunnelClient(websocket, stream) {Uri = uri};
         //TODO: Reconnect websocket if closed after initial connection if tunnel has not been disposed
-        stream.Completion.ContinueWith(_ => tunnels.TryRemove(new KeyValuePair<string, Tunnel>(tunnelId, tunnel)), TaskScheduler.Default);
+        tunnel.Completion.ContinueWith(_ =>
+        {
+            logger.LogDebug("Removing tunnel {TunnelId}, uri: {Uri}", tunnelId, uri);
+            return tunnels.TryRemove(new KeyValuePair<string, Tunnel>(tunnelId, tunnel));
+        }, TaskScheduler.Default);
         return tunnels.GetOrAdd(tunnelId, tunnel);
     }
 
@@ -57,13 +61,14 @@ public class TunnelManager(IEnumerable<ITunnelClientFactory> tunnelClientFactori
             oldTunnel.Dispose();
             return tunnel;
         });
+        logger.LogDebug("Tunnel connected: {TunnelId} from {RemoteIpAddress}:{RemotePort}", tunnelId, context.Connection.RemoteIpAddress, context.Connection.RemotePort);
         try
-        { 
+        {
             await stream.Completion;
         }
         catch (Exception e)
         {
-            Console.WriteLine("Tunnel: {0}, Error: {1}", tunnelId, e.Message);
+            logger.LogDebug("Tunnel: {TunnelId}, Message: {Message}", tunnelId, e.Message);
         }
         finally
         {

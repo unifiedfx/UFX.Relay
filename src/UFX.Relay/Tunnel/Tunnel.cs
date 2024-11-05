@@ -6,6 +6,7 @@ namespace UFX.Relay.Tunnel;
 public class Tunnel(MultiplexingStream stream) : IAsyncDisposable, IDisposable
 {
     public Uri? Uri { get; set; }
+    public Task Completion => stream?.Completion ?? Task.CompletedTask;
     private bool channelOfferedSubscribed;
     private readonly Channel<MultiplexingStream.Channel> channels = Channel.CreateUnbounded<MultiplexingStream.Channel>();
     private MultiplexingStream? stream = stream;

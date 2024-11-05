@@ -32,7 +32,6 @@ public static class TunnelBuilderExtensions
         app.UseWebSockets(options);
         return endpoints.MapGet(path, static async (HttpContext context, string tunnelId, ITunnelManager tunnelManager) => {
             if (!context.WebSockets.IsWebSocketRequest) return Results.BadRequest();
-            Console.WriteLine($"Tunnel connected: {tunnelId}");
             await tunnelManager.StartTunnelAsync(context, tunnelId);
             return Results.Empty;
         }).ExcludeFromDescription();
