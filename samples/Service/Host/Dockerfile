@@ -17,6 +17,7 @@ WORKDIR /src
 COPY ["Directory.Build.props", "./Directory.Build.props"]
 COPY ["samples/Service/Host/.", "./samples/Service/Host/"]
 COPY ["src/UFX.Relay/.", "./src/UFX.Relay/"]
+COPY ["Open.snk", "./Open.snk"]
 
 WORKDIR "/src/samples/Service/Host"
 RUN dotnet restore "Host.csproj"
