@@ -13,6 +13,7 @@ public class TunnelClient(ClientWebSocket webSocket, MultiplexingStream stream) 
 
     protected override async ValueTask DisposeAsyncCore()
     {
+        if (webSocket.State != WebSocketState.Open) return;
         try
         {
             await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, default);
