@@ -13,10 +13,12 @@ public sealed class TunnelConnectionListener(TunnelEndpoint endpoint, ITunnelIdP
 
     public async ValueTask<ConnectionContext?> AcceptAsync(CancellationToken cancellationToken = default)
     {
-        while (true)
+        var linkedToken = CancellationTokenSource
+            .CreateLinkedTokenSource(unbindTokenSource.Token, cancellationToken)
+            .Token;
+        
+        while (! linkedToken.IsCancellationRequested)
         {
-            var linkedToken = CancellationTokenSource
-                .CreateLinkedTokenSource(unbindTokenSource.Token, cancellationToken).Token;
             await GetTunnelAsync(linkedToken);
             if (endpoint.Tunnel == null) return null;
             try
@@ -31,6 +33,9 @@ public sealed class TunnelConnectionListener(TunnelEndpoint endpoint, ITunnelIdP
                 continue;
             }
         }
+
+        // Fall through to here if caller cancelled, or Listener was ‘unbound’:
+        return null;
     }
     
     public async Task BindAsync()
