@@ -26,7 +26,17 @@ public class Tunnel(MultiplexingStream stream) : IAsyncDisposable, IDisposable
             if(!channelOfferedSubscribed) stream.ChannelOffered += StreamOnChannelOffered;
             channelOfferedSubscribed = true;
         }
-        return await channels.Reader.ReadAsync(cancellationToken);
+        
+        var channelResult = channels.Reader.ReadAsync(cancellationToken).AsTask();
+        var streamCompletion = stream.Completion; 
+#pragma warning disable VSTHRD003 // Waiting on (Completion) task outside context
+        await Task.WhenAny(streamCompletion, channelResult);
+#pragma warning restore VSTHRD003 // Waiting on (Completion) task outside context
+
+        // 'stream.Completion' indicates that the underlying stream closed first:
+        if (streamCompletion.IsCompleted) throw new UnderlyingStreamClosedException();
+        
+        return await channelResult;
     }
 
     private async void StreamOnChannelOffered(object? sender, MultiplexingStream.ChannelOfferEventArgs e)
@@ -43,6 +53,7 @@ public class Tunnel(MultiplexingStream stream) : IAsyncDisposable, IDisposable
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
+    
     public async ValueTask DisposeAsync()
     {
         await DisposeAsyncCore().ConfigureAwait(false);
