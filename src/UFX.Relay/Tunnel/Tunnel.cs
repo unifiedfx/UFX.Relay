@@ -18,7 +18,7 @@ public class Tunnel(MultiplexingStream stream) : IAsyncDisposable, IDisposable
         var channel = await stream.OfferChannelAsync(channelId, cancellationToken);
         return channel;
     }
-    public async Task<MultiplexingStream.Channel> GetChannelAsync(CancellationToken operationCancellation = default)
+    public async Task<MultiplexingStream.Channel> GetChannelAsync(CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(stream, nameof(stream));
         lock (channels)
@@ -27,13 +27,14 @@ public class Tunnel(MultiplexingStream stream) : IAsyncDisposable, IDisposable
             channelOfferedSubscribed = true;
         }
         
-        var channelResult = channels.Reader.ReadAsync(operationCancellation).AsTask();
+        var channelResult = channels.Reader.ReadAsync(cancellationToken).AsTask();
+        var streamCompletion = stream.Completion; 
 #pragma warning disable VSTHRD003 // Waiting on (Completion) task outside context
-        await Task.WhenAny(stream.Completion, channelResult);
+        await Task.WhenAny(streamCompletion, channelResult);
 #pragma warning restore VSTHRD003 // Waiting on (Completion) task outside context
 
-        // If channel result not completed, then 'stream.Completion' must have won:
-        if (!channelResult.IsCompleted) throw new UnderlyingStreamClosedException();
+        // 'stream.Completion' indicates that the underlying stream closed first:
+        if (streamCompletion.IsCompleted) throw new UnderlyingStreamClosedException();
         
         return await channelResult;
     }
