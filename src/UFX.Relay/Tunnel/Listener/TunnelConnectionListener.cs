@@ -13,18 +13,24 @@ public sealed class TunnelConnectionListener(TunnelEndpoint endpoint, ITunnelIdP
 
     public async ValueTask<ConnectionContext?> AcceptAsync(CancellationToken cancellationToken = default)
     {
-        var linkedToken = CancellationTokenSource
-            .CreateLinkedTokenSource(unbindTokenSource.Token, cancellationToken).Token;
-        await GetTunnelAsync(linkedToken);
-        if (endpoint.Tunnel == null) return null;
-        try
+        while (true)
         {
-            var channel = await endpoint.Tunnel
-                .GetChannelAsync(endpoint.Tunnel is TunnelHost ? Guid.NewGuid().ToString("N") : null, linkedToken);
-            return new TunnelConnectionContext(channel.QualifiedId.ToString(), channel, endpoint);
+            var linkedToken = CancellationTokenSource
+                .CreateLinkedTokenSource(unbindTokenSource.Token, cancellationToken).Token;
+            await GetTunnelAsync(linkedToken);
+            if (endpoint.Tunnel == null) return null;
+            try
+            {
+                var channel = await endpoint.Tunnel
+                    .GetChannelAsync(endpoint.Tunnel is TunnelHost ? Guid.NewGuid().ToString("N") : null, linkedToken);
+                return new TunnelConnectionContext(channel.QualifiedId.ToString(), channel, endpoint);
+            }
+            catch (UnderlyingStreamClosedException)
+            {
+                // The WebSocket stream closed underneath us while waiting for the channel:
+                continue;
+            }
         }
-        catch (OperationCanceledException) { }
-        return null;
     }
     
     public async Task BindAsync()
