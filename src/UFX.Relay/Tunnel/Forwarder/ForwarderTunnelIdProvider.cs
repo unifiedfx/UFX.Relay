@@ -8,7 +8,7 @@ public class ForwarderTunnelIdProvider(IHttpContextAccessor accessor, IOptions<T
 {
     public ValueTask<string?> GetTunnelIdAsync()
     {
-        return new(accessor.HttpContext == null ? null : GetFromQuery() ?? accessor.HttpContext.GetTunnelIdFromHost() ?? GetFromHeader());
+        return new(accessor.HttpContext == null ? null : GetFromQuery() ?? GetFromHeader() ?? accessor.HttpContext.GetTunnelIdFromHost());
         string? GetFromQuery() => accessor.HttpContext.Request.Query[options.Value.TunnelIdHeader].FirstOrDefault();
         string? GetFromHeader() =>
             accessor.HttpContext.Request.Headers[options.Value.TunnelIdHeader].FirstOrDefault() ??
